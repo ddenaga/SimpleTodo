@@ -20,9 +20,21 @@ class MainActivity : AppCompatActivity() {
         val etTask = findViewById<EditText>(R.id.etTask)
         val rvTasks = findViewById<RecyclerView>(R.id.rvTasks)
 
-        // Binding the adapter to the recyclerView.
+        // Binding the adapter to the RecyclerView.
         val adapter = TasksAdapter(tasks)
         rvTasks.adapter = adapter
         rvTasks.layoutManager = LinearLayoutManager(this)
+
+        // Add items by listening to the button and reading the edit text view.
+        btnAdd.setOnClickListener {
+            if (etTask.text.isNotBlank()) {
+                // Add task to the list and update the RecyclerView.
+                tasks.add(etTask.text.toString())
+                adapter.notifyItemInserted(tasks.size - 1)
+            }
+
+            // Clear the text field.
+            etTask.text.clear()
+        }
     }
 }

@@ -10,10 +10,19 @@ import androidx.recyclerview.widget.RecyclerView
 class MainActivity : AppCompatActivity() {
 
     val tasks: MutableList<String> = mutableListOf<String>()
+    lateinit var adapter: TasksAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Long click listener for items in the RecyclerView.
+        val onLongClickListener = object : TasksAdapter.OnLongClickListener {
+            override fun onItemLongClicked(position: Int) {
+                tasks.removeAt(position)
+                adapter.notifyDataSetChanged()
+            }
+        }
 
         // Reference views from the main layout.
         val btnAdd = findViewById<Button>(R.id.btnAdd)
@@ -21,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         val rvTasks = findViewById<RecyclerView>(R.id.rvTasks)
 
         // Binding the adapter to the RecyclerView.
-        val adapter = TasksAdapter(tasks)
+        adapter = TasksAdapter(tasks, onLongClickListener)
         rvTasks.adapter = adapter
         rvTasks.layoutManager = LinearLayoutManager(this)
 

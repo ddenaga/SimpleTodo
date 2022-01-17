@@ -4,7 +4,7 @@
 
 Submitted by: **Daryl Denaga**
 
-Time spent: **X** hours spent in total
+Time spent: **4** hours spent in total
 
 ## User Stories
 
@@ -30,7 +30,7 @@ Here's a walkthrough of implemented user stories:
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+* Deleting items from a RecyclerView isn't as simple as adding items. I had to create an interface and override a function so that the adapter can update with the data set as well as persist the data.
 
 ## License
 

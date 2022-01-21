@@ -1,10 +1,14 @@
 package com.github.ddenaga.simpletodo
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.apache.commons.io.FileUtils
@@ -21,21 +25,41 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Long click listener for items in the RecyclerView.
+        // Long click listener for removing items in the RecyclerView.
         val onLongClickListener = object : TasksAdapter.OnLongClickListener {
             override fun onItemLongClicked(position: Int) {
+                adapter.notifyItemRemoved(position)
                 tasks.removeAt(position)
-                adapter.notifyDataSetChanged()
                 // Save tasks.
                 savePersistentData()
             }
         }
 
+        // Click listener for editting items in the RecyclerView.
         val onClickListener = object : TasksAdapter.OnClickListener {
-            override fun onItemClicked(position: Int) {
-                val intent = Intent(this@MainActivity, EditActivity::class.java)
+            val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    result: ActivityResult ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val position = result.data?.getIntExtra("position", 0) as Int
+                    val taskText = result.data?.getStringExtra("taskText") as String
 
-                startActivity(intent)
+                    if (taskText.isNotBlank()) {
+                        tasks[position] = taskText
+                        adapter.notifyItemChanged(position)
+                    }
+                    else {
+                        adapter.notifyItemRemoved(position)
+                        tasks.removeAt(position)
+                    }
+                    savePersistentData()
+                }
+            }
+
+            override fun onItemClicked(position: Int) {
+                val i = Intent(this@MainActivity, EditActivity::class.java)
+                i.putExtra("taskText", tasks[position])
+                i.putExtra("position", position)
+                startForResult.launch(i)
             }
         }
 

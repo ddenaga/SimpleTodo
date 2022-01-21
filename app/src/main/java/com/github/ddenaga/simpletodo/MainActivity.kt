@@ -1,5 +1,6 @@
 package com.github.ddenaga.simpletodo
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -30,6 +31,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val onClickListener = object : TasksAdapter.OnClickListener {
+            override fun onItemClicked(position: Int) {
+                val intent = Intent(this@MainActivity, EditActivity::class.java)
+
+                startActivity(intent)
+            }
+        }
+
         // Load persistent data.
         loadPersistentData()
 
@@ -39,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         val rvTasks = findViewById<RecyclerView>(R.id.rvTasks)
 
         // Binding the adapter to the RecyclerView.
-        adapter = TasksAdapter(tasks, onLongClickListener)
+        adapter = TasksAdapter(tasks, onLongClickListener, onClickListener)
         rvTasks.adapter = adapter
         rvTasks.layoutManager = LinearLayoutManager(this)
 

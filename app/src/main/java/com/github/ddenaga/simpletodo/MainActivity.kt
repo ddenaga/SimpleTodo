@@ -25,44 +25,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Long click listener for removing items in the RecyclerView.
-        val onLongClickListener = object : TasksAdapter.OnLongClickListener {
-            override fun onItemLongClicked(position: Int) {
-                adapter.notifyItemRemoved(position)
-                tasks.removeAt(position)
-                // Save tasks.
-                savePersistentData()
-            }
-        }
-
-        // Click listener for editting items in the RecyclerView.
-        val onClickListener = object : TasksAdapter.OnClickListener {
-            val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    result: ActivityResult ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val position = result.data?.getIntExtra("position", 0) as Int
-                    val taskText = result.data?.getStringExtra("taskText") as String
-
-                    if (taskText.isNotBlank()) {
-                        tasks[position] = taskText
-                        adapter.notifyItemChanged(position)
-                    }
-                    else {
-                        adapter.notifyItemRemoved(position)
-                        tasks.removeAt(position)
-                    }
-                    savePersistentData()
-                }
-            }
-
-            override fun onItemClicked(position: Int) {
-                val i = Intent(this@MainActivity, EditActivity::class.java)
-                i.putExtra("taskText", tasks[position])
-                i.putExtra("position", position)
-                startForResult.launch(i)
-            }
-        }
-
         // Load persistent data.
         loadPersistentData()
 
@@ -72,9 +34,40 @@ class MainActivity : AppCompatActivity() {
         val rvTasks = findViewById<RecyclerView>(R.id.rvTasks)
 
         // Binding the adapter to the RecyclerView.
-        adapter = TasksAdapter(tasks, onLongClickListener, onClickListener)
+        adapter = TasksAdapter(tasks)
         rvTasks.adapter = adapter
         rvTasks.layoutManager = LinearLayoutManager(this)
+
+        val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val position = result.data?.getIntExtra("position", 0) as Int
+                val taskText = result.data?.getStringExtra("taskText") as String
+
+                if (taskText.isNotBlank()) {
+                    tasks[position] = taskText
+                    adapter.notifyItemChanged(position)
+                }
+                else {
+                    adapter.notifyItemRemoved(position)
+                    tasks.removeAt(position)
+                }
+                savePersistentData()
+            }
+        }
+
+        adapter.onItemClick = { position ->
+            val i = Intent(this@MainActivity, EditActivity::class.java)
+            i.putExtra("taskText", tasks[position])
+            i.putExtra("position", position)
+            startForResult.launch(i)
+        }
+
+        adapter.onItemLongClick = { position ->
+            tasks.removeAt(position)
+            adapter.notifyItemRemoved(position)
+            savePersistentData()
+        }
 
         // Add items by listening to the button and reading the edit text view.
         btnAdd.setOnClickListener {

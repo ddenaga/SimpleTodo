@@ -31,7 +31,9 @@ Here's a walkthrough of implemented user stories:
 
 ## Notes
 
-* Deleting items from a RecyclerView isn't as simple as adding items. I had to create an interface and override a function so that the adapter can update with the data set as well as persist the data.
+* Kotlin doesn't have static members, however, companion objects work similarly.
+* In getting a result from an activity, CodePath's guide uses [startActivityForResult](https://guides.codepath.com/android/Using-Intents-to-Create-Flows#returning-data-result-to-parent-activity), but it's deprecated. The up-to-date method is using the [Activity Result APIs](https://developer.android.com/training/basics/intents/result).
+* Using lambda functions is a lot cleaner than using interfaces for the RecyclerView item click listeners. [See here.](https://stackoverflow.com/a/49480714)
 
 ## License
 
